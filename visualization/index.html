@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>CP-net parent restriction explorer</title>
+<style>
+:root{font:16px/1.52 system-ui,sans-serif;color-scheme:dark;color:#eef7ff;background:#0b1523}
+*{box-sizing:border-box}
+body{margin:0}
+main{max-width:58rem;margin:auto;padding:1.65rem clamp(1rem,3vw,2rem) 2rem}
+h1{font-size:clamp(1.55rem,5vw,2.4rem);margin:0 0 .4rem;line-height:1.15}
+h2{font-size:1.15rem;margin:.1rem 0}
+p{margin:.35rem 0 .9rem;color:#c0d4e6}
+.controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,13rem),1fr));gap:.8rem;margin:1rem 0}
+.group{display:flex;flex-wrap:wrap;gap:.55rem;align-content:center;align-items:center;border:1px solid #35506b;padding:.7rem .8rem;border-radius:10px}
+select,button{font:inherit;padding:.4rem .6rem;background:#1d3651;color:#fff;border:1px solid #45617d;border-radius:6px}
+input{font:inherit;accent-color:#79ddc6}
+input[type=checkbox]{width:1.1rem;height:1.1rem;vertical-align:text-bottom}
+input[type=range]{min-width:0;width:8rem;flex:1}
+.cubes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.75rem}
+article{margin:0;border-radius:12px;background:#132338;border:1px solid #35506b;padding:.65rem}
+.card-head{text-align:center;font-weight:700}
+canvas{display:block;width:100%;height:auto;aspect-ratio:1.15;touch-action:pan-y}
+.stats{color:#ffd284;min-height:3rem;text-align:center;overflow-wrap:anywhere}
+.result{margin-top:1rem;border-left:4px solid #ffd284;padding:.68rem .8rem;background:#132338}
+.result p{margin:0}
+.result strong{color:#eef7ff}
+a{color:#a3dafd}
+:focus-visible{outline:2px solid #ffd284;outline-offset:3px}
+</style>
+</head>
+<body>
+<main>
+<h1>One omitted parent</h1>
+<p>Four voters choose between 0 and 1 for a target attribute. Voter i votes for 1 exactly when at least one bit <em>other than</em> Xᵢ is 1. The parent-restricted rule must make one decision for the two highlighted contexts.</p>
+<div class="controls">
+  <label class="group" for="omitted">Hide
+    <select id="omitted"><option value="0">X1</option><option value="1">X2</option><option value="2">X3</option><option value="3">X4</option></select>
+  </label>
+  <div class="group" id="visible" role="group" aria-label="Visible bits">
+    <label><input id="bit0" type="checkbox"> <span></span></label>
+    <label><input id="bit1" type="checkbox"> <span></span></label>
+    <label><input id="bit2" type="checkbox"> <span></span></label>
+  </div>
+  <label class="group" for="angle">Rotate <input id="angle" type="range" min="0" max="360" value="21"></label>
+</div>
+<div class="cubes">
+  <article><div class="card-head" id="label0"></div><canvas id="cube0" width="400" height="348" aria-label="Three-dimensional cube of visible settings with the hidden bit zero"></canvas><div class="stats" id="stats0"></div></article>
+  <article><div class="card-head" id="label1"></div><canvas id="cube1" width="400" height="348" aria-label="Three-dimensional cube of visible settings with the hidden bit one"></canvas><div class="stats" id="stats1"></div></article>
+</div>
+<div class="result" aria-live="polite">
+  <h2 id="decision"></h2>
+  <p id="costs"></p>
+</div>
+<p style="margin-top:1rem">Across all 16 contexts, <strong>Algorithm 1 costs 6</strong> and <strong>full majority costs 4</strong>. This is the exact four-input example. The paper proves the general ratio.</p>
+</main>
+<script>
+"use strict";
+const byId = id => document.getElementById(id);
+const omitted = byId("omitted");
+const angleControl = byId("angle");
+const checkboxes = [0, 1, 2].map(j => byId("bit" + j));
+const voteColors = ["#93adc2", "#93adc2", "#93adc2", "#74c3ff", "#65dec2"];
+
+function fullContext(mask, hiddenIndex, hiddenValue) {
+  let visibleIndex = 0;
+  return Array.from({length: 4}, (_, i) =>
+    i === hiddenIndex ? hiddenValue : (mask >> visibleIndex++) & 1);
+}
+
+function votesForOne(bits) {
+  return bits.reduce((count, _, i) =>
+    count + Number(bits.some((bit, j) => i !== j && bit === 1)), 0);
+}
+
+function drawCube(hidden, mask, hiddenIndex, angle) {
+  const canvas = byId("cube" + hidden);
+  const ctx = canvas.getContext("2d");
+  const vertices = Array.from({length: 8}, (_, n) => {
+    const [x0, y0, z0] = [0, 1, 2].map(j => n & (1 << j) ? 1 : -1);
+    const x = x0 * Math.cos(angle) + z0 * Math.sin(angle);
+    const z1 = -x0 * Math.sin(angle) + z0 * Math.cos(angle);
+    const y = y0 * Math.cos(.38) - z1 * Math.sin(.38);
+    const depth = y0 * Math.sin(.38) + z1 * Math.cos(.38);
+    const scale = 90 / (1 + .11 * depth);
+    return {x: 200 + scale * x, y: 174 - scale * y, depth, n};
+  });
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.strokeStyle = "#385777";
+  ctx.lineWidth = 4;
+  for (const v of vertices) {
+    for (let axis = 0; axis < 3; axis++) {
+      if (v.n & (1 << axis)) continue;
+      const w = vertices[v.n ^ (1 << axis)];
+      ctx.beginPath();
+      ctx.moveTo(v.x, v.y);
+      ctx.lineTo(w.x, w.y);
+      ctx.stroke();
+    }
+  }
+  for (const v of vertices.slice().sort((a, b) => b.depth - a.depth)) {
+    ctx.beginPath();
+    ctx.arc(v.x, v.y, 10 - v.depth, 0, 2 * Math.PI);
+    ctx.fillStyle = voteColors[votesForOne(fullContext(v.n, hiddenIndex, hidden))];
+    ctx.fill();
+  }
+  const selected = vertices[mask];
+  ctx.beginPath();
+  ctx.arc(selected.x, selected.y, 20, 0, 2 * Math.PI);
+  ctx.strokeStyle = "#ffd284";
+  ctx.lineWidth = 4;
+  ctx.stroke();
+}
+
+function render() {
+  const hiddenIndex = Number(omitted.value);
+  const visible = [0, 1, 2, 3].filter(i => i !== hiddenIndex);
+  const mask = checkboxes.reduce((acc, checkbox, j) => acc + (Number(checkbox.checked) << j), 0);
+  const angle = Number(angleControl.value) * Math.PI / 180;
+  checkboxes.forEach((checkbox, j) => {
+    checkbox.nextElementSibling.textContent = "X" + (visible[j] + 1);
+  });
+  let cost0 = 0;
+  [0, 1].forEach(hidden => {
+    const bits = fullContext(mask, hiddenIndex, hidden);
+    const votes = votesForOne(bits);
+    cost0 += votes;
+    byId("label" + hidden).textContent = "Hidden X" + (hiddenIndex + 1) + " = " + hidden;
+    byId("stats" + hidden).textContent = bits.join("") + " · " + votes + "/4 vote 1";
+    drawCube(hidden, mask, hiddenIndex, angle);
+  });
+  const cost1 = 8 - cost0;
+  byId("decision").textContent = "Choose output " + Number(cost1 < cost0) + " for this pair";
+  byId("costs").textContent = "Output 0 costs " + cost0 + " · Output 1 costs " + cost1;
+}
+[omitted, angleControl, ...checkboxes].forEach(item => item.addEventListener("input", render));
+render();
+</script>
+</body>
+</html>

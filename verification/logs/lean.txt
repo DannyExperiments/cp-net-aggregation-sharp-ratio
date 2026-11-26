@@ -1,0 +1,5 @@
+'ParentRestricted.unrestricted_four' depends on axioms: [propext]
+'ParentRestricted.every_restricted_four' depends on axioms: [propext]
+'ParentRestricted.zero_fiber_four' depends on axioms: [propext]
+'ParentRestricted.violation_four' depends on axioms: [propext]
+'ParentRestricted.pair_bound' depends on axioms: [propext]

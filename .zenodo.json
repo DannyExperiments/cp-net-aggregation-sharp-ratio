@@ -1,0 +1,29 @@
+{
+  "title": "The sharp approximation ratio for parent-restricted CP-net aggregation",
+  "upload_type": "software",
+  "creators": [
+    {
+      "name": "DannyExperiments"
+    }
+  ],
+  "keywords": [
+    "conditional preference networks",
+    "preference aggregation",
+    "approximation ratio",
+    "swap disagreement",
+    "parent set restriction"
+  ],
+  "description": "<p>For t complete binary conditional preference tables with t ≥ 3, Algorithm 1 of Ali, Yang and Zilles has exact worst-case ratio 2 − 2/t. Four inputs yield cost 6 versus unrestricted optimum 4, answering the four-thirds question in the AAAI 2024 conclusion.</p><p>Each table votes by the OR of all bits except one. Fixing its parent set pairs the all-zero context with the singleton on the omitted attribute. Pooling their votes makes output 0 optimal even though the singleton alone strictly favors output 1. Each re-optimization recovers the corresponding input, and best-input averaging proves the matching upper bound.</p><p>The singleton voting pattern comes from the representative-voter example of Endriss and Grandi. The contribution is its realization under overlapping parent sets to attain the ratio after full re-optimization. This result concerns the specific algorithm and binary swap objective. The prior four-thirds guarantee for indegree-at-most-one inputs is compatible.</p><p>Internally reviewed, not peer reviewed. The paper gives the general proof. Exact Python replay checks the displayed family through 12 inputs. A partial Lean certificate verifies the four-input costs, its strict violation and one arithmetic inequality.</p><p>Under human direction, ChatGPT Astra 6.2 (OpenAI) generated the discovery proof and research packet. OpenAI Codex independently checked the mathematics. GPT-6.2 Sol (OpenAI) checked the literature and prepared the manuscript, replay, partial Lean certificate and illustrations. DannyExperiments is the preferred citation identity. No AI system is proposed as an author.</p><p>Release v1.0.0. https://github.com/DannyExperiments/cp-net-aggregation-sharp-ratio/releases/tag/v1.0.0</p>",
+  "license": "other-closed",
+  "notes": "All rights reserved. Publicly downloadable files are supplied without a repository-wide reuse license.",
+  "publication_date": "2026-11-27",
+  "version": "1.0.0",
+  "access_right": "open",
+  "related_identifiers": [
+    {
+      "identifier": "https://github.com/DannyExperiments/cp-net-aggregation-sharp-ratio/releases/tag/v1.0.0",
+      "relation": "isSupplementTo",
+      "resource_type": "software"
+    }
+  ]
+}

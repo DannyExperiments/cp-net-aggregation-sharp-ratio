@@ -1,0 +1,13 @@
+t=3: OPT=3, Algorithm 1=4, ratio=4/3
+t=4, hide X1, visible bits 000: ones=(0,3), costs=(3,5)
+t=4, hide X1, visible bits 100: ones=(3,4), costs=(7,1)
+t=4: OPT=4, Algorithm 1=6, ratio=3/2
+t=5: OPT=5, Algorithm 1=8, ratio=8/5
+t=6: OPT=6, Algorithm 1=10, ratio=5/3
+t=7: OPT=7, Algorithm 1=12, ratio=12/7
+t=8: OPT=8, Algorithm 1=14, ratio=7/4
+t=9: OPT=9, Algorithm 1=16, ratio=16/9
+t=10: OPT=10, Algorithm 1=18, ratio=9/5
+t=11: OPT=11, Algorithm 1=20, ratio=20/11
+t=12: OPT=12, Algorithm 1=22, ratio=11/6
+PASS: all OR profiles from 3 through 12 inputs and vote inequalities through 200

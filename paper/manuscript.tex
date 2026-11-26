@@ -1,0 +1,177 @@
+\documentclass[11pt]{amsart}
+\usepackage[T1]{fontenc}
+\usepackage[margin=1.05in]{geometry}
+\DeclareFontShape{OT1}{cmr}{bx}{n}{<-> cmbx10}{}
+\DeclareMathSizes{8}{8}{8}{8}
+\DeclareMathSizes{9}{9}{8}{8}
+\DeclareMathSizes{10.95}{10.95}{8}{8}
+\newtheorem{theorem}{Theorem}
+\newcommand{\OPT}{\operatorname{OPT}}
+\newcommand{\Alg}{\operatorname{ALG}}
+\title{The sharp approximation ratio for parent-restricted CP-net aggregation}
+\date{November 27, 2026}
+\begin{document}
+\begin{abstract}
+For each \(t\ge3\), the worst-case approximation ratio of Algorithm~1
+of Ali, Yang and Zilles on \(t\) complete binary conditional preference
+tables is exactly \(2-2/t\). The family
+lifts the representative-voter example of Endriss and Grandi into
+overlapping input parent sets. Re-optimizing over each such set
+reproduces its input table. For four inputs the costs are \(6\) and \(4\),
+which answers the source's four-thirds question in the negative.
+A standard best-input average gives the matching upper bound.
+\end{abstract}
+\maketitle
+
+\section{Swap model and algorithm}
+For binary attributes \(X_1,\ldots,X_m,V\), a complete conditional
+preference table (CPT) for \(V\) on a parent set \(P\subseteq
+\{X_1,\ldots,X_m\}\) declares one strict preference in every assignment
+to \(P\). Interpret its output bit as the preferred value of \(V\).
+Every context \(x\in\{0,1\}^m\) specifies exactly one swap at \(V\),
+between the two outcomes that differ only at \(V\). The table orders the
+swap by its output on the restriction \(x|_P\). Write \(g_i(x)\) for the
+bit chosen by the \(i\)-th input, with all contexts expanded. The cost
+of an aggregate \(h\) is
+\[
+  F(h)=\sum_{x\in\{0,1\}^m}\sum_{i=1}^t
+        [h(x)\ne g_i(x)] .
+\]
+Here brackets denote the indicator of a true statement. Unrestricted optimum \(\OPT\) allows any parent set. It takes a
+pointwise majority and pays \(\sum_x k_x\), where \(k_x\) is the
+minority vote count and a tie has \(k_x=t/2\). Each choice on each
+context is realizable with the full parent set.
+
+In Algorithm~1 of Ali, Yang and Zilles \cite[pp.~10437--10438]{ayz},
+the allowed parent sets are subsets of one input parent set. For each
+input parent set \(P\), it re-optimizes the table by pooling votes over
+all contexts with the same \(x|_P\). It takes the best such candidate.
+Ali, Yang and Zilles ask in their conclusion whether this rule always
+achieves a \(4/3\)-approximation. The quantification is over this local
+algorithm for the target attribute. The lower bound below is also
+realizable by complete acyclic CP-nets with \(V\) as a sink and
+identical unconditional preferences for the other attributes.
+
+\section{Exact ratio}
+\begin{theorem}
+For every \(t\ge 3\), the worst-case ratio of Algorithm~1 on
+\(t\) complete binary input CPTs is \(2-2/t\), evaluated over
+instances of positive optimum. At \(t=4\) the ratio is \(3/2\).
+The supremum over all input counts is \(2\).
+\end{theorem}
+
+\begin{proof}
+For the upper bound, use the best-input argument underlying the
+representative-voter rule of Endriss and Grandi \cite{eg}
+and Theorem~4 of \cite{ayz}. Every input table is feasible for
+Algorithm~1, so \(\Alg\le \min_i F(g_i)\). At a context with
+\(k=k_x\), the sum of the costs of the \(t\) candidates is
+\(2k(t-k)\), the number of ordered pairs of opposing votes. When
+\(k>0\), it is at most \(2(t-1)k\). The same inequality holds for
+\(k=0\). Averaging over the \(t\) candidates and summing,
+\[
+  \Alg \le \frac{1}{t}\sum_{i=1}^t F(g_i)
+       \le \left(2-\frac{2}{t}\right) \OPT .
+\]
+In particular, zero optimum forces zero algorithm cost.
+
+For sharpness take \(m=t\) and the complete tables
+\[
+       P_i=\{X_j:j\ne i\},\qquad
+       g_i(x)=\bigvee_{j\ne i} x_j,\qquad i=1,\ldots,t .
+\]
+Every declared parent is relevant, as can be seen by setting all
+other visible bits to zero. The entire profile is explicit with
+\(2^{t-1}\) rows per table. At \(0^t\) all votes are zero. At each
+unit vector \(e_i\), only \(g_i\) votes zero. With at least two
+ones all votes are one. Thus the full OR is the unique unrestricted
+optimal function for \(t\ge 3\) and pays exactly \(\OPT=t\).
+
+Fix an input parent set \(P_i\). It pairs each context \(x\)
+with \(x_i=0\) with the context formed by changing \(x_i\) to one.
+For every assignment of the visible bits with at least one one,
+both completions have strict-majority vote one. The unique
+cost-minimizing output on every such pair is one. The all-zero
+assignment of the visible bits instead pairs \(0^t\) and \(e_i\).
+The two constant choices on this pair cost
+\[
+\begin{array}{c|cc|c}
+\text{output on the pair} & 0^t & e_i & \text{sum}\\ \hline
+0 & 0 & t-1 & t-1\\
+1 & t & 1   & t+1
+\end{array}
+\]
+so the unique choice is zero. The restricted optimum therefore
+reproduces \(g_i\) on all contexts. Every CPT on a subset of \(P_i\)
+is constant on the same pairs, so it cannot lower this cost.
+
+Relative to full OR, \(g_i\) changes only \(e_i\). Its cost is
+therefore \(t-1\) from the other unit contexts plus \(t-1\) from
+\(e_i\), giving \(\Alg=2(t-1)\). Equivalently, \(g_i\) disagrees
+with every different input \(g_j\) on exactly \(e_i,e_j\).
+Every re-optimized candidate has this same cost. The ratio
+is \(2(t-1)/t\), and these values approach \(2\) as \(t\) grows.
+\end{proof}
+
+\section{Worked case and prior results}
+With \(t=4\) there are five attributes including \(V\), and each
+input table has eight rows. If \(X_1\) is hidden, the all-zero
+visible row pairs \(0000\) and \(1000\). Across the two contexts
+there are three votes for one and five for zero. The algorithm chooses
+zero there, paying three disagreements, and pays one on each of the
+other three unit contexts. Full OR pays one on each of the four unit
+contexts. Thus \(6/4=3/2>4/3\). The result concerns the stated
+parent-set restriction. The full OR in this family has \(2^t\) rows,
+twice the size of a single input table. The source already observes
+that unrestricted optimization is efficient for constant \(t\)
+\cite[Proposition~3]{ayz}.
+
+The votes on the \(t\) unit contexts form the complement of the
+identity-matrix profile of Endriss and Grandi
+\cite[Example~2]{eg}; the other contexts are unanimous. That example
+already gives \(2-2/t\) for representative-voter selection. In the
+CPT transfer in \cite[Theorems~16--17]{ayz}, Algorithm~1 can recover
+the unrestricted optimum even when selecting an input is nearly a
+factor of two worse. Here the overlapping parent sets force each
+restricted optimization to keep its input rule. This is the role of
+the unanimous contexts, which constrain the context pairs in a way
+that plain ballot distances do not record. An independent guarantee
+of \(4/3\) for best-input aggregation of CPTs with at most one parent
+also applies there to Algorithm~1 \cite[Theorem~5.1]{aoyz}. The
+construction above has \(t-1\) relevant parents in each input.
+Ali's dissertation restates the general question for the same rule,
+renumbered Algorithm~3 \cite[Sec.~3.7]{aliThesis}.
+
+\clearpage
+\section*{Verification and technical disclosure}
+The Python replay checks every context and restricted fiber in the
+displayed family for \(3\le t\le12\). A partial Lean~4 certificate
+checks the four-input costs and fiber, the strict \(4/3\) violation,
+and an integer inequality in the upper-bound calculation. The
+general CP-net argument is given in the paper. Internally reviewed,
+not peer reviewed. Under human direction, ChatGPT Astra~6.2 (OpenAI)
+generated the discovery proof and research packet. OpenAI Codex
+independently checked the mathematics. GPT-6.2 Sol (OpenAI) checked
+the literature and prepared the manuscript, exact replay, partial
+Lean certificate and illustrations. DannyExperiments maintains the
+repository and is the preferred citation identity. No AI system is
+proposed as an author.
+
+\begin{thebibliography}{9}
+\raggedright
+\bibitem{eg} U. Endriss and U. Grandi,
+\emph{Binary aggregation by selection of the most representative voters},
+AAAI 28(1) (2014), 668--674. doi:10.1609/aaai.v28i1.8798.
+\bibitem{ayz} A. M. H. Ali, B. Yang and S. Zilles,
+\emph{Approximation algorithms for preference aggregation using CP-nets},
+AAAI 38(9) (2024), 10433--10441. doi:10.1609/aaai.v38i9.28911.
+\bibitem{aoyz} A. M. H. Ali, D. Ogundare, B. Yang and S. Zilles,
+\emph{Approximation ratio for preference aggregation using tree CP-nets},
+AAMAS (2025), 78--86.
+\bibitem{aliThesis} A. M. H. Ali,
+\emph{Exact and approximate preference aggregation using conditional preference
+networks}, PhD thesis, University of Regina, October 2025.
+Handle: 10294/17240.
+\end{thebibliography}
+
+\end{document}
